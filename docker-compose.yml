@@ -1,5 +1,45 @@
-version: '2'
+version: '3.4'
+
+
+x-airflow-instance:
+  &airflow-instance
+  stop_grace_period: 24h
+  stop_signal: TERM
+  build: .
+  environment:
+    AIRFLOW__CORE__DAGS_FOLDER: "/home/airflow/dags"
+    AIRFLOW__CORE__PLUGINS_FOLDER: "/home/airflow/plugins"
+    AIRFLOW__CORE__EXECUTOR: "CeleryExecutor"
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://airflow:airflow@db:5432/airflow"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    AIRFLOW__CORE__FERNET_KEY: "hZkztR7zQ6j3l19124n9LybVvwFMO9MsMyN0vQwhc_0="
+    AIRFLOW__CELERY__BROKER_URL: "amqp://rabbitmq:5672//"
+    AIRFLOW__CELERY__CELERY_RESULT_BACKEND: "db+postgresql://airflow:airflow@db:5432/airflow"
+    AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT: "False"
+    AIRFLOW__WEBSERVER__WORKERS: 1
+    AIRFLOW__CELERY__SSL_ACTIVE: "False"
+    C_FORCE_ROOT: "True"
+
+  volumes:
+    - ./examples:/home/airflow/dags
+    - ./multi_dagrun:/home/airflow/plugins/multi_dagrun
+
+
 services:
+  webserver:
+    <<: *airflow-instance
+    command: ["airflow", "webserver"]
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  worker:
+    <<: *airflow-instance
+    command: ["airflow", "worker"]
+
+  scheduler:
+    <<: *airflow-instance
+    command: ["airflow", "scheduler"]
+
   db:
     image: postgres:10-alpine
     command: postgres -c max_connections=300

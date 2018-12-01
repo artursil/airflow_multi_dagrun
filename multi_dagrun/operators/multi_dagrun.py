@@ -25,13 +25,13 @@ class TriggerMultiDagRunOperator(TriggerDagRunOperator):
 
         session = settings.Session()
         created_dr_ids = []
+        now = datetime.utcnow()
         for dro in self.python_callable(*self.op_args, **self.op_kwargs):
             if not dro:
                 break
             if not isinstance(dro, DagRunOrder):
                 dro = DagRunOrder(payload=dro)
 
-            now = datetime.utcnow()
             if dro.run_id is None:
                 dro.run_id = 'trig__' + now.isoformat()
 

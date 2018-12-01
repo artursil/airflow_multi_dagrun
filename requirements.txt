@@ -1,0 +1,5 @@
+apache-airflow
+#-e git://github.com/apache/incubator-airflow.git#egg=apache-airflow
+psycopg2-binary>=2.7.4
+celery>=4.1.1, <4.2.0
+cryptography

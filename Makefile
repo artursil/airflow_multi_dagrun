@@ -12,6 +12,7 @@ AIRFLOW__CELERY__BROKER_URL=amqp://127.0.0.1:5672//
 AIRFLOW__CELERY__CELERY_RESULT_BACKEND=db+postgresql://airflow:airflow@127.0.0.1:5432/airflow
 AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT=False
 AIRFLOW__WEBSERVER__WORKERS=1
+AIRFLOW__CELERY__SSL_ACTIVE=False
 
 # https://blog.phusion.nl/2017/10/13/why-ruby-app-servers-break-on-macos-high-sierra-and-what-can-be-done-about-it/
 OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
@@ -28,12 +29,14 @@ worker: run_containers
 scheduler: run_containers
 	airflow scheduler
 
-initdb: run_containers
+initdb:
+	docker-compose up -d db
 	docker-compose run --rm db sh -c 'createdb -h db $$POSTGRES_DB'
-	airflow initdb
+	docker-compose run webserver airflow initdb
 
-resetdb: run_containers
+resetdb:
+	docker-compose up -d db
 	docker-compose run --rm db sh -c \
 		'dropdb -h db --if-exists $$POSTGRES_DB && \
 		 createdb -h db $$POSTGRES_DB'
-	airflow initdb
+	docker-compose run webserver airflow initdb

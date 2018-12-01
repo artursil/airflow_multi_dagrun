@@ -1,0 +1,6 @@
+/frontend/build
+/.git
+**/*.pyc
+**/__pycache__
+env
+data
