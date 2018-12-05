@@ -4,5 +4,4 @@ services:
   - docker
 
 script:
-  - docker-compose run --rm webserver airflow list_dags
   - make test
