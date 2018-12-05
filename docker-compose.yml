@@ -9,7 +9,7 @@ services:
       - POSTGRES_DB=airflow
 
   webserver:
-    image: puckel/docker-airflow:1.10.1
+    image: puckel/docker-airflow:latest
     restart: always
     depends_on:
       - postgres
